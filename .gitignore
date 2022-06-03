@@ -1,5 +1,2 @@
 # env files
-scraper/Include
-scraper/Scripts
-scraper/Lib
-scraper/pyvenv.cfg
+olx-crawler
