@@ -1,6 +1,27 @@
+from shutil import ExecError
+import sqlite3
 from http.cookiejar import Cookie
 from bs4 import BeautifulSoup
 import requests
+# import save_db as sbd
+DB_NAME='adv.db'
+ADVERTISMENTS=list()
+DB_NAME = "adv.db"
+
+CREATE_ADVERTISMENT_TABLE = """
+CREATE TABLE IF NOT EXISTS advertisment(
+price TEXT NOT NULL,
+title TEXT NOT NULL,
+url TEXT NOT NULL,
+location TEXT NOT NULL
+);"""
+
+ADD_RECORD = """    
+INSERT INTO advertisment(title, price, url, location)
+VALUES('{}','{}','{}','{}')
+"""
+
+
 
 class Advertisment:
     def __init__(self, url, title, price,location):
@@ -56,10 +77,32 @@ def GetAdvertisement(url):
             pass
     return advertisments
 
+def WriteAdds(data):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+    except Exception:
+        pass
+    
+    curr=conn.cursor()
+    
+    try:
+        curr.execute(CREATE_ADVERTISMENT_TABLE)
+        conn.commit()
+    except Exception:
+        pass
+    
+    for el in data:
+        try:
+            curr.execute(ADD_RECORD.format(el.title, el.price, el.url, el.location))
+            conn.commit()
+        except Exception:
+            pass
 
 def main():
-    a = GetAdvertisement(GetRequest())
-    for el in a:
-        print(el.title,' ', el.price)
+    ADVERTISMENTS = GetAdvertisement(GetRequest())
+    WriteAdds(ADVERTISMENTS)
+    # sbd.SaveToDatabase(ADVERTISMENTS)
+    # for el in a:
+    #     print(el.title,' ', el.price)
 if __name__=='__main__':
     main()
